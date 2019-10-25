@@ -3,14 +3,9 @@ import {ClientSession, startSession} from 'mongoose';
 
 const sessionMetadataKey = Symbol("SessionHandler");
 
-const getKey = function (propertyKey: string | symbol, parameterIndex: any) {
-    return propertyKey.toString() + ":" + parameterIndex;
-}
 
-
-export function SessionHandler(target: Object, propertyKey: string | symbol, parameterIndex: any) {
-    let key: string = getKey(propertyKey, parameterIndex);
-    Reflect.defineMetadata(sessionMetadataKey, true, target, key);
+export function SessionHandler(target: any, propertyKey: string | symbol, parameterIndex: any) {
+    Reflect.defineMetadata(sessionMetadataKey, parameterIndex, target, propertyKey);
 }
 
 /**
@@ -24,29 +19,25 @@ export function Transaction() {
     return function (target: any, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<Function>) {
         let method = descriptor.value;
         descriptor.value = function () {
-            let key: string;
             let _this = this;
             let _args: any = arguments;
-            for (let parameterIndex: any = 0; parameterIndex < method.length; parameterIndex++) {
-                key = getKey(propertyKey, parameterIndex);
-                if (Reflect.getOwnMetadata(sessionMetadataKey, target, key)) {
-                    if (_args[parameterIndex] != null) {
-                        // 若事务已经存在则不用新开启事务
-                        return method.apply(_this, _args);
-                    } else {
-                        return acid((session: ClientSession) => {
-                            // 传入session
-                            _args[parameterIndex] = session;
-                            return method.apply(_this, _args);
-                        });
-                    }
+            const parameterIndex: any = Reflect.getOwnMetadata(sessionMetadataKey, target, propertyKey);
+            if (parameterIndex != null) {
+                if (_args[parameterIndex] != null) {
+                    // 若事务已经存在则不用新开启事务
+                    return method.apply(_this, _args);
+                } else {
+                    return acid((session: ClientSession) => {
+                        // 传入session
+                        let args: any = [];
+                        Object.assign(args, _args)
+                        args[parameterIndex] = session;
+                        return method.apply(_this, args);
+                    });
                 }
             }
-            return acid((session: ClientSession) => {
-                // 将session作为最后一个参数传入
-                _args.push(session);
-                return method.apply(_this, _args)
-            });
+            // 不需要开启session
+            return method.apply(_this, _args);
         }
     }
 }

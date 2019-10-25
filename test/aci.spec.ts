@@ -20,7 +20,7 @@ describe("Transaction", function () {
             createTime: now,
             updateTime: now
         };
-        let result: IOperatLog = await service.saveNormal(data, null);
+        let result: IOperatLog = await service.saveNormal(data);
         it("saveNormal save data success", () => {
             expect(result).to.equal(null);
             expect(result.id).to.equal(data._id.toString());
@@ -42,7 +42,7 @@ describe("Transaction", function () {
             updateTime: now
         };
         try {
-            let result: IOperatLog = await service.saveError(data, null);
+            let result: IOperatLog = await service.saveError(data);
             it("saveError save data success", () => {
                 expect(result).to.equal(null);
                 expect(result.id).to.equal(data._id.toString());
