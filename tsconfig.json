@@ -1,18 +1,18 @@
 {
-  "compileOnSave": true,
   "compilerOptions": {
-    "outDir": "build",
-    "module": "commonjs",
+    "outDir": "build/compiled",
     "target": "es5",
-    "lib": ["es2016"],
+    "module": "commonjs",
+    "lib": ["es6"],
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "sourceMap": true,
     "noImplicitAny": true,
-    "sourceMap": true
+    "declaration": true
   },
   "exclude": [
-    "node_modules",
-    "build"
+    "build",
+    "node_modules"
   ]
 }

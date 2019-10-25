@@ -9,7 +9,7 @@
 ```text
 import "reflect-metadata";
 import {ClientSession} from "mongoose";
-import {SessionHandler, Transaction} from "../lib";
+import {SessionHandler, Transaction} from "viching-mongodb-acid";
 
 class Test {
 
@@ -24,3 +24,5 @@ class Test {
     }
 }
 ```
+
+

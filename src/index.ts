@@ -58,8 +58,8 @@ export function Transaction() {
  */
 async function acid(callback: (session: ClientSession) => Promise<any>): Promise<any> {
     const session = await startSession();
-    session.startTransaction();
     try {
+        session.startTransaction();
         const value = await callback(session);
         // Since the mutations ran without an error, commit the transaction.
         await session.commitTransaction();
